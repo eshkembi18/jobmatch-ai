@@ -1,27 +1,157 @@
-<!DOCTYPE html>
+html:<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>JobMatch AI</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-
   <header>
-    <h1>JobMatch AI</h1>
+    <div class="site-title">JobMatch AI</div>
+    <nav>
+      <ul>
+        <li><a href="#home">Home</a></li>
+        <li><a href="#jobs">Jobs</a></li>
+        <li><a href="#companies">Companies</a></li>
+        <li><a href="#advice">Advice</a></li>
+        <li><a href="#about">About</a></li>
+      </ul>
+    </nav>
   </header>
 
-  <main>
-    <section id="home">
-      <p>Welcome to our job board!</p>
-    </section>
-  </main>
+  <!-- Hero Section -->
+  <section id="home" class="section">
+    <h1>Find Your Perfect Job Match</h1>
+    <p>Use AI to discover job opportunities based on your skills and location.</p>
+    <button onclick="document.getElementById('overview').scrollIntoView({ behavior: 'smooth' })">Get Started</button>
+  </section>
+
+  <!-- Why Use JobMatch AI Section -->
+  <section id="overview" class="section">
+    <h2>Why Use JobMatch AI</h2>
+    <div class="info-cards">
+      <div class="info-card">
+        <h4>🔍 AI Job Matching</h4>
+        <p>Our AI algorithm connects your skills and location to relevant job openings in seconds.</p>
+      </div>
+      <div class="info-card">
+        <h4>🛠️ Built by Students</h4>
+        <p>JobMatch AI was developed by passionate students to make job searches smarter and easier.</p>
+      </div>
+      <div class="info-card">
+        <h4>📈 Career Tools</h4>
+        <p>From resume tips to interview prep, everything you need to boost your job hunt is here.</p>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat"><strong>10+</strong><br>Job Filters</div>
+      <div class="stat"><strong>100%</strong><br>Student Built</div>
+      <div class="stat"><strong>5</strong><br>Core Features</div>
+      <div class="stat"><strong>∞</strong><br>AI Potential</div>
+    </div>
+    <div class="how-it-works">
+      <h4>🚀 How It Works</h4>
+      <ol>
+        <li><strong>Create Profile:</strong> Tell us about your skills, experience, and career goals.</li>
+        <li><strong>AI Analysis:</strong> Our advanced algorithms analyze your profile and market trends.</li>
+        <li><strong>Smart Matching:</strong> Receive personalized job recommendations that fit perfectly.</li>
+        <li><strong>Apply & Succeed:</strong> Apply with confidence using our AI-optimized application tools.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- Jobs Section -->
+  <section id="jobs" class="section">
+    <h2>Search for Jobs</h2>
+    <form id="jobForm">
+      <input type="text" name="skills" placeholder="Enter skills (e.g., Python, Excel)" required />
+      <input type="text" name="location" placeholder="Enter location (e.g., Detroit, MI)" required />
+      <select name="experience">
+        <option value="">Experience Level</option>
+        <option value="entry">Entry</option>
+        <option value="mid">Mid</option>
+        <option value="senior">Senior</option>
+      </select>
+      <input type="text" name="industry" placeholder="Industry (e.g., Tech, Finance)" />
+      <button type="submit">Match Me</button>
+    </form>
+
+    <div class="recommendations">
+      <h3>AI-Powered Recommendations</h3>
+      <div class="card">Software Engineer - Detroit, MI</div>
+      <div class="card">Data Analyst - Remote</div>
+    </div>
+
+    <div class="recently-viewed">
+      <h3>Recently Viewed Jobs</h3>
+      <ul>
+        <li>UX Designer - Chicago, IL</li>
+        <li>Frontend Developer - Detroit, MI</li>
+      </ul>
+    </div>
+
+    <div class="saved-jobs">
+      <h3>Saved Jobs</h3>
+      <ul>
+        <li>AI Research Assistant - Remote</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Companies Section -->
+  <section id="companies" class="section">
+    <h2>Top Companies</h2>
+    <div class="company-card">
+      <h4>TechNova Inc.</h4>
+      <p>Industry: Technology | Location: San Francisco, CA</p>
+      <p>Company Size: 500+ | Culture: Collaborative & Fast-paced</p>
+      <p>Openings: Software Engineer, DevOps Analyst</p>
+    </div>
+    <div class="company-card">
+      <h4>EcoBank</h4>
+      <p>Industry: Finance | Location: New York, NY</p>
+      <p>Company Size: 1000+ | Culture: Diverse & Growth-Oriented</p>
+      <p>Openings: Data Analyst, Security Engineer</p>
+    </div>
+  </section>
+
+  <!-- Career Advice Section -->
+  <section id="advice" class="section">
+    <h2>Career Advice</h2>
+    <div class="advice-card">
+      <h4>Resume Builder & Optimizer</h4>
+      <p>Create an AI-optimized resume to stand out to recruiters.</p>
+    </div>
+    <div class="advice-card">
+      <h4>Interview Preparation</h4>
+      <p>Practice common interview questions with AI feedback.</p>
+    </div>
+    <div class="advice-card">
+      <h4>Salary Negotiation Tips</h4>
+      <p>Learn how to negotiate offers with confidence and clarity.</p>
+    </div>
+    <div class="advice-card">
+      <h4>Career Path Recommendations</h4>
+      <p>Explore roles that match your background and interests.</p>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section id="about" class="section">
+    <h2>About JobMatch AI</h2>
+    <p class="centered">JobMatch AI is a student-built web platform created to help users discover jobs aligned with their skills, interests, and location. Our mission is to simplify the job hunt by using AI to give smarter and more personal recommendations to every user.</p>
+    <h3 class="small-heading">Contact Us</h3>
+    <p class="centered">Email: jobmatchai@gmail.com</p>
+  </section>
 
   <footer>
-    <p>&copy; 2025 JobMatch AI</p>
+    <p>&copy; 2025 JobMatch AI — Built with ❤️ by Manar & Era</p>
   </footer>
 
   <script src="script.js"></script>
 </body>
 </html>
+
+
+
