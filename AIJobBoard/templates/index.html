@@ -2,16 +2,108 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>AI Job Board</title>
+  <title>JobMatch AI</title>
+  <!-- Bootstrap CSS -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+    integrity="sha384-…snip…"
+    crossorigin="anonymous"
+  >
+  <!-- Your custom CSS (optional overrides) -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-<body>
-  <h1>Welcome to the AI Job Board</h1>
-  <p>Your AI-powered job search starts here.</p>
-  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<body class="bg-light">
+
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg navbar-white bg-white shadow-sm">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="{{ url_for('index') }}">JobMatch AI</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navMenu"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navMenu">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}">Jobs</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Companies</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Career Advice</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">About</a></li>
+          <li class="nav-item ms-3">
+            <a class="btn btn-primary" href="{{ url_for('post_job_page') }}">Post Job</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO SECTION -->
+  <header class="py-5 bg-white border-bottom mb-4">
+    <div class="container">
+      <h1 class="display-5">Find your perfect job match with <span class="text-primary">AI</span></h1>
+      <p class="lead text-muted">Our AI analyzes your skills and preferences to deliver the best-fit roles.</p>
+    </div>
+  </header>
+
+  <!-- SEARCH PANEL -->
+  <section class="container mb-5">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <form id="search-form" class="row g-3 align-items-center">
+          <div class="col-md-4">
+            <label class="form-label visually-hidden" for="search">Keyword</label>
+            <input
+              type="text"
+              id="search"
+              class="form-control"
+              placeholder="Job, skill, or company"
+            >
+          </div>
+          <div class="col-md-3">
+            <label class="form-label visually-hidden" for="zip">Location / ZIP</label>
+            <input
+              type="text"
+              id="zip"
+              class="form-control"
+              placeholder="Location or ZIP"
+            >
+          </div>
+          <div class="col-md-3">
+            <label class="form-label visually-hidden" for="skills">Skills</label>
+            <input
+              type="text"
+              id="skills"
+              class="form-control"
+              placeholder="Skills, e.g. Python"
+            >
+          </div>
+          <div class="col-md-2 d-grid">
+            <button
+              type="button"
+              id="search-btn"
+              class="btn btn-primary"
+            >Search Jobs</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOB LIST -->
+  <section class="container">
+    <ul id="job-list" class="list-group"></ul>
+  </section>
+
+  <!-- Bootstrap JS & your script -->
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-…snip…"
+    crossorigin="anonymous"
+  ></script>
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>
-<nav>
-  <a href="{{ url_for('index') }}">Home</a> |
-  <a href="{{ url_for('post_job_page') }}">Post Job</a>
-</nav>

@@ -2,12 +2,27 @@
 from flask import Blueprint, request, jsonify
 from db import db
 from models import Job, Company
+from sqlalchemy import or_
+
 
 api = Blueprint('api', __name__, url_prefix='/api')
 
 @api.route('/jobs', methods=['GET'])
 def get_jobs():
-    jobs = Job.query.order_by(Job.posted_at.desc()).all()
+    # read the q param (case-insensitive search on title or description)
+    q = request.args.get('q', '').strip()
+    query = Job.query.join(Company)
+    if q:
+        ilike = f"%{q}%"
+        query = query.filter(
+            or_(
+                Job.title.ilike(ilike),
+                Job.description.ilike(ilike),
+                Company.name.ilike(ilike)
+            )
+        )
+    jobs = query.order_by(Job.posted_at.desc()).all()
+
     return jsonify([{
         'id': j.id,
         'title': j.title,

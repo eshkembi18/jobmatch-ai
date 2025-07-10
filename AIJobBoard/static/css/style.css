@@ -1,1 +1,10 @@
-body { font-family: sans-serif; margin: 2rem; }
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+}
+.list-group-item {
+  margin-bottom: .5rem;
+  border: 1px solid #ececec;
+  border-radius: .25rem;
+}
+
