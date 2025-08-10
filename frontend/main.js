@@ -1,372 +1,252 @@
-// AI Job Board - Job Posting JavaScript functionality
-
-class JobPosting {
-    constructor() {
-        this.init();
+// Sample Data
+const sampleJobs = [
+    {
+        id: 1,
+        title: "Senior Software Engineer",
+        company: "TechCorp Inc.",
+        location: "San Francisco, CA",
+        type: "Full-time",
+        experience: "senior",
+        salary: { min: 120000, max: 180000 },
+        description: "Join our innovative team building cutting-edge software solutions. We're looking for a senior developer with expertise in modern web technologies.",
+        skills: ["JavaScript", "React", "Node.js", "PostgreSQL", "AWS"],
+        remote: true,
+        posted: "2 days ago"
+    },
+    {
+        id: 2,
+        title: "Product Designer",
+        company: "Design Studio",
+        location: "New York, NY",
+        type: "Full-time",
+        experience: "mid",
+        salary: { min: 80000, max: 120000 },
+        description: "Create beautiful and intuitive user experiences for our growing product portfolio. Work with cross-functional teams to deliver exceptional designs.",
+        skills: ["Figma", "Sketch", "Prototyping", "User Research", "Design Systems"],
+        remote: false,
+        posted: "1 day ago"
+    },
+    {
+        id: 3,
+        title: "Data Scientist",
+        company: "AI Innovations",
+        location: "Remote",
+        type: "Full-time",
+        experience: "mid",
+        salary: { min: 100000, max: 150000 },
+        description: "Analyze complex datasets and build machine learning models to drive business insights and decision making.",
+        skills: ["Python", "Machine Learning", "SQL", "TensorFlow", "Statistics"],
+        remote: true,
+        posted: "3 days ago"
+    },
+    {
+        id: 4,
+        title: "Frontend Developer",
+        company: "StartupXYZ",
+        location: "Austin, TX",
+        type: "Full-time",
+        experience: "entry",
+        salary: { min: 60000, max: 90000 },
+        description: "Build responsive web applications using modern frontend frameworks. Great opportunity for growth in a dynamic startup environment.",
+        skills: ["HTML", "CSS", "JavaScript", "Vue.js", "Tailwind CSS"],
+        remote: true,
+        posted: "1 week ago"
+    },
+    {
+        id: 5,
+        title: "DevOps Engineer",
+        company: "CloudTech Solutions",
+        location: "Seattle, WA",
+        type: "Full-time",
+        experience: "senior",
+        salary: { min: 110000, max: 160000 },
+        description: "Manage cloud infrastructure and deployment pipelines. Ensure high availability and scalability of our services.",
+        skills: ["Docker", "Kubernetes", "AWS", "Terraform", "CI/CD"],
+        remote: true,
+        posted: "5 days ago"
+    },
+    {
+        id: 6,
+        title: "Marketing Manager",
+        company: "Growth Marketing Co.",
+        location: "Los Angeles, CA",
+        type: "Full-time",
+        experience: "mid",
+        salary: { min: 70000, max: 100000 },
+        description: "Lead marketing campaigns and strategies to drive customer acquisition and brand awareness. Work with creative and data teams.",
+        skills: ["Digital Marketing", "Analytics", "Content Strategy", "SEO", "Social Media"],
+        remote: false,
+        posted: "4 days ago"
     }
+];
 
-    init() {
-        this.setupEventListeners();
-        this.setupFormValidation();
+const sampleCompanies = [
+    {
+        id: 1,
+        name: "TechCorp Inc.",
+        industry: "Technology",
+        description: "Leading technology company focused on innovative software solutions for enterprises.",
+        size: "1000-5000",
+        locations: ["San Francisco, CA", "New York, NY", "Austin, TX"],
+        openJobs: 45
+    },
+    {
+        id: 2,
+        name: "Design Studio",
+        industry: "Design",
+        description: "Creative design agency specializing in user experience and brand identity.",
+        size: "50-200",
+        locations: ["New York, NY", "Los Angeles, CA"],
+        openJobs: 12
+    },
+    {
+        id: 3,
+        name: "AI Innovations",
+        industry: "Artificial Intelligence",
+        description: "Cutting-edge AI research and development company creating the future of technology.",
+        size: "200-1000",
+        locations: ["Remote", "San Francisco, CA"],
+        openJobs: 28
+    },
+    {
+        id: 4,
+        name: "StartupXYZ",
+        industry: "Fintech",
+        description: "Fast-growing fintech startup revolutionizing digital payments and banking.",
+        size: "10-50",
+        locations: ["Austin, TX"],
+        openJobs: 8
+    },
+    {
+        id: 5,
+        name: "CloudTech Solutions",
+        industry: "Cloud Services",
+        description: "Enterprise cloud infrastructure and services provider with global reach.",
+        size: "500-1000",
+        locations: ["Seattle, WA", "Portland, OR", "Denver, CO"],
+        openJobs: 35
+    },
+    {
+        id: 6,
+        name: "Growth Marketing Co.",
+        industry: "Marketing",
+        description: "Full-service marketing agency helping businesses scale and grow their customer base.",
+        size: "100-500",
+        locations: ["Los Angeles, CA", "San Diego, CA"],
+        openJobs: 15
     }
+];
 
-    setupEventListeners() {
-        // Form submission
-        document.getElementById('jobPostingForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            this.submitJobPosting();
-        });
-
-        // Real-time validation
-        const requiredFields = ['jobTitle', 'company', 'location', 'contactEmail', 'jobType', 'jobDescription', 'jobRequirements'];
-        requiredFields.forEach(fieldId => {
-            const field = document.getElementById(fieldId);
-            if (field) {
-                field.addEventListener('blur', () => this.validateField(field));
-                field.addEventListener('input', () => this.clearFieldError(field));
-            }
-        });
-
-        // Salary validation
-        document.getElementById('salaryMin').addEventListener('input', () => this.validateSalaryRange());
-        document.getElementById('salaryMax').addEventListener('input', () => this.validateSalaryRange());
-
-        // Skills input enhancement
-        this.setupSkillsInput();
+const sampleCareerPaths = [
+    {
+        id: 1,
+        title: "Full Stack Development",
+        icon: "fas fa-code",
+        description: "Master both frontend and backend technologies to become a versatile developer",
+        skillGap: "Focus on learning React, Node.js, and database management",
+        learningRecommendations: "Complete full-stack bootcamp, build portfolio projects",
+        industryTrends: "High demand for full-stack developers, especially with cloud experience",
+        careerProgression: "Junior → Mid-level → Senior → Tech Lead → Engineering Manager",
+        growthPotential: "Very High"
+    },
+    {
+        id: 2,
+        title: "Data Science & Analytics",
+        icon: "fas fa-chart-line",
+        description: "Transform data into actionable insights using statistical analysis and machine learning",
+        skillGap: "Strengthen Python, statistics, and machine learning algorithms",
+        learningRecommendations: "Data science certification, Kaggle competitions, statistics courses",
+        industryTrends: "Explosive growth in AI/ML roles, high salaries",
+        careerProgression: "Analyst → Data Scientist → Senior DS → Principal DS → Head of Data",
+        growthPotential: "Very High"
+    },
+    {
+        id: 3,
+        title: "Product Management",
+        icon: "fas fa-lightbulb",
+        description: "Guide product strategy and work with cross-functional teams to deliver value",
+        skillGap: "Develop strategic thinking, user research, and stakeholder management",
+        learningRecommendations: "Product management courses, user research training, business analysis",
+        industryTrends: "Strong demand for product managers in tech companies",
+        careerProgression: "Associate PM → PM → Senior PM → Principal PM → VP Product",
+        growthPotential: "High"
+    },
+    {
+        id: 4,
+        title: "UI/UX Design",
+        icon: "fas fa-paint-brush",
+        description: "Create intuitive and beautiful user experiences that delight customers",
+        skillGap: "Master design tools, user research, and prototyping",
+        learningRecommendations: "Design bootcamp, portfolio development, user psychology courses",
+        industryTrends: "Growing emphasis on user experience across all industries",
+        careerProgression: "Junior Designer → Mid-level → Senior → Lead → Design Director",
+        growthPotential: "High"
+    },
+    {
+        id: 5,
+        title: "Cloud Engineering",
+        icon: "fas fa-cloud",
+        description: "Build and maintain scalable cloud infrastructure and services",
+        skillGap: "Learn AWS/Azure/GCP, containerization, and infrastructure as code",
+        learningRecommendations: "Cloud certifications, DevOps training, hands-on projects",
+        industryTrends: "Massive shift to cloud, high demand for cloud expertise",
+        careerProgression: "Cloud Engineer → Senior → Architect → Principal → CTO",
+        growthPotential: "Very High"
     }
+];
 
-    setupFormValidation() {
-        // Add Bootstrap validation classes
-        const form = document.getElementById('jobPostingForm');
-        form.classList.add('needs-validation');
-    }
-
-    setupSkillsInput() {
-        const skillsInput = document.getElementById('skillsTags');
-        
-        // Add placeholder suggestions
-        const commonSkills = [
-            'JavaScript', 'Python', 'Java', 'React', 'Node.js', 'AWS', 'SQL', 'Git',
-            'Docker', 'Kubernetes', 'MongoDB', 'PostgreSQL', 'HTML', 'CSS', 'Vue.js',
-            'Angular', 'Express.js', 'Flask', 'Django', 'Spring Boot', 'GraphQL', 'REST API'
-        ];
-
-        // Create skills suggestions dropdown
-        const suggestionsContainer = document.createElement('div');
-        suggestionsContainer.className = 'skills-suggestions mt-2';
-        suggestionsContainer.innerHTML = `
-            <small class="text-muted">Popular skills:</small><br>
-            ${commonSkills.slice(0, 10).map(skill => 
-                `<span class="badge bg-light text-dark me-1 mb-1 skill-suggestion" style="cursor: pointer;">${skill}</span>`
-            ).join('')}
-        `;
-        
-        skillsInput.parentNode.appendChild(suggestionsContainer);
-
-        // Add click listeners to skill suggestions
-        suggestionsContainer.addEventListener('click', (e) => {
-            if (e.target.classList.contains('skill-suggestion')) {
-                const skill = e.target.textContent;
-                const currentSkills = skillsInput.value.split(',').map(s => s.trim()).filter(s => s);
-                
-                if (!currentSkills.includes(skill)) {
-                    currentSkills.push(skill);
-                    skillsInput.value = currentSkills.join(', ');
-                    this.highlightAddedSkill(e.target);
-                }
-            }
-        });
-    }
-
-    highlightAddedSkill(element) {
-        element.classList.remove('bg-light', 'text-dark');
-        element.classList.add('bg-success', 'text-white');
-        setTimeout(() => {
-            element.classList.remove('bg-success', 'text-white');
-            element.classList.add('bg-light', 'text-dark');
-        }, 1000);
-    }
-
-    validateField(field) {
-        const value = field.value.trim();
-        let isValid = true;
-        let errorMessage = '';
-
-        // Check if required field is empty
-        if (field.hasAttribute('required') && !value) {
-            isValid = false;
-            errorMessage = 'This field is required.';
-        }
-
-        // Specific validations
-        switch (field.id) {
-            case 'contactEmail':
-                if (value && !this.isValidEmail(value)) {
-                    isValid = false;
-                    errorMessage = 'Please enter a valid email address.';
-                }
-                break;
-            case 'jobTitle':
-                if (value && value.length < 3) {
-                    isValid = false;
-                    errorMessage = 'Job title must be at least 3 characters long.';
-                }
-                break;
-            case 'jobDescription':
-                if (value && value.length < 50) {
-                    isValid = false;
-                    errorMessage = 'Job description should be at least 50 characters long.';
-                }
-                break;
-            case 'jobRequirements':
-                if (value && value.length < 20) {
-                    isValid = false;
-                    errorMessage = 'Requirements should be at least 20 characters long.';
-                }
-                break;
-        }
-
-        this.displayFieldValidation(field, isValid, errorMessage);
-        return isValid;
-    }
-
-    validateSalaryRange() {
-        const minSalary = parseInt(document.getElementById('salaryMin').value) || 0;
-        const maxSalary = parseInt(document.getElementById('salaryMax').value) || 0;
-
-        if (minSalary > 0 && maxSalary > 0 && minSalary >= maxSalary) {
-            this.displayFieldValidation(
-                document.getElementById('salaryMax'), 
-                false, 
-                'Maximum salary must be higher than minimum salary.'
-            );
-            return false;
-        }
-
-        // Clear any previous errors
-        this.clearFieldError(document.getElementById('salaryMin'));
-        this.clearFieldError(document.getElementById('salaryMax'));
-        return true;
-    }
-
-    displayFieldValidation(field, isValid, errorMessage) {
-        // Remove existing validation classes and messages
-        field.classList.remove('is-valid', 'is-invalid');
-        this.removeErrorMessage(field);
-
-        if (!isValid) {
-            field.classList.add('is-invalid');
-            this.addErrorMessage(field, errorMessage);
-        } else if (field.value.trim()) {
-            field.classList.add('is-valid');
-        }
-    }
-
-    addErrorMessage(field, message) {
-        const errorDiv = document.createElement('div');
-        errorDiv.className = 'invalid-feedback';
-        errorDiv.textContent = message;
-        field.parentNode.appendChild(errorDiv);
-    }
-
-    removeErrorMessage(field) {
-        const existingError = field.parentNode.querySelector('.invalid-feedback');
-        if (existingError) {
-            existingError.remove();
-        }
-    }
-
-    clearFieldError(field) {
-        field.classList.remove('is-invalid');
-        this.removeErrorMessage(field);
-    }
-
-    isValidEmail(email) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
-    }
-
-    validateForm() {
-        const requiredFields = [
-            'jobTitle', 'company', 'location', 'contactEmail', 
-            'jobType', 'jobDescription', 'jobRequirements'
-        ];
-
-        let isFormValid = true;
-
-        // Validate all required fields
-        requiredFields.forEach(fieldId => {
-            const field = document.getElementById(fieldId);
-            if (!this.validateField(field)) {
-                isFormValid = false;
-            }
-        });
-
-        // Validate salary range
-        if (!this.validateSalaryRange()) {
-            isFormValid = false;
-        }
-
-        return isFormValid;
-    }
-
-    async submitJobPosting() {
-        // Show loading state
-        const submitBtn = document.querySelector('#jobPostingForm button[type="submit"]');
-        const originalText = submitBtn.innerHTML;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Posting Job...';
-        submitBtn.disabled = true;
-
-        try {
-            // Validate form
-            if (!this.validateForm()) {
-                throw new Error('Please fix the validation errors before submitting.');
-            }
-
-            // Collect form data
-            const formData = this.collectFormData();
-
-            // Submit to API
-            const response = await fetch('/api/jobs', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData)
-            });
-
-            const data = await response.json();
-
-            if (data.success) {
-                this.showSuccessModal();
-                this.resetForm();
-            } else {
-                throw new Error(data.error || 'Failed to post job');
-            }
-
-        } catch (error) {
-            console.error('Error posting job:', error);
-            this.showError(error.message);
-        } finally {
-            // Restore button state
-            submitBtn.innerHTML = originalText;
-            submitBtn.disabled = false;
-        }
-    }
-
-    collectFormData() {
-        const skills = document.getElementById('skillsTags').value
-            .split(',')
-            .map(skill => skill.trim())
-            .filter(skill => skill.length > 0);
-
-        return {
-            title: document.getElementById('jobTitle').value.trim(),
-            company: document.getElementById('company').value.trim(),
-            location: document.getElementById('location').value.trim(),
-            contact_email: document.getElementById('contactEmail').value.trim(),
-            job_type: document.getElementById('jobType').value,
-            experience_level: document.getElementById('experienceLevel').value,
-            is_remote: document.getElementById('isRemote').checked,
-            salary_min: parseInt(document.getElementById('salaryMin').value) || null,
-            salary_max: parseInt(document.getElementById('salaryMax').value) || null,
-            description: document.getElementById('jobDescription').value.trim(),
-            requirements: document.getElementById('jobRequirements').value.trim(),
-            skills: skills
-        };
-    }
-
-    resetForm() {
-        document.getElementById('jobPostingForm').reset();
-        
-        // Clear validation classes
-        document.querySelectorAll('.is-valid, .is-invalid').forEach(field => {
-            field.classList.remove('is-valid', 'is-invalid');
-        });
-
-        // Remove error messages
-        document.querySelectorAll('.invalid-feedback').forEach(error => {
-            error.remove();
-        });
-    }
-
-    showSuccessModal() {
-        const modal = new bootstrap.Modal(document.getElementById('successModal'));
-        modal.show();
-    }
-
-    showError(message) {
-        // Create error alert
-        const alertDiv = document.createElement('div');
-        alertDiv.className = 'alert alert-danger alert-dismissible fade show';
-        alertDiv.innerHTML = `
-            <i class="fas fa-exclamation-triangle me-2"></i>
-            <strong>Error:</strong> ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        `;
-
-        // Insert at top of form
-        const form = document.getElementById('jobPostingForm');
-        form.insertBefore(alertDiv, form.firstChild);
-
-        // Scroll to top of form
-        form.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-        // Auto-remove after 10 seconds
-        setTimeout(() => {
-            if (alertDiv.parentNode) {
-                alertDiv.remove();
-            }
-        }, 10000);
-    }
-
-    showSuccess(message) {
-        // Create success alert
-        const alertDiv = document.createElement('div');
-        alertDiv.className = 'alert alert-success alert-dismissible fade show';
-        alertDiv.innerHTML = `
-            <i class="fas fa-check-circle me-2"></i>
-            <strong>Success:</strong> ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        `;
-
-        // Insert at top of form
-        const form = document.getElementById('jobPostingForm');
-        form.insertBefore(alertDiv, form.firstChild);
-
-        // Scroll to top of form
-        form.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+// Utility Functions
+function getCompanyColor(name) {
+    const colors = [
+        "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
+        "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
+        "linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)",
+        "linear-gradient(135deg, #fa709a 0%, #fee140 100%)",
+        "linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)",
+        "linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)",
+        "linear-gradient(135deg, #ff8a80 0%, #ea4c89 100%)"
+    ];
+    const index = name.charCodeAt(0) % colors.length;
+    return colors[index];
 }
 
-// Initialize job posting functionality when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    new JobPosting();
-});
+function formatSalary(min, max) {
+    if (!min || !max) return "Salary not disclosed";
+    return `$${(min / 1000)}K - $${(max / 1000)}K`;
+}
 
-// Add character counters for text areas
-document.addEventListener('DOMContentLoaded', () => {
-    const textareas = document.querySelectorAll('textarea');
-    
-    textareas.forEach(textarea => {
-        const maxLength = textarea.getAttribute('maxlength');
-        if (maxLength) {
-            const counter = document.createElement('div');
-            counter.className = 'form-text text-end';
-            counter.innerHTML = `<span class="char-count">0</span>/${maxLength} characters`;
-            textarea.parentNode.appendChild(counter);
+function truncateText(text, maxLength) {
+    if (text.length <= maxLength) return text;
+    return text.substr(0, maxLength) + "...";
+}
 
-            textarea.addEventListener('input', () => {
-                const count = textarea.value.length;
-                const countSpan = counter.querySelector('.char-count');
-                countSpan.textContent = count;
-                
-                if (count > maxLength * 0.9) {
-                    countSpan.classList.add('text-warning');
-                } else {
-                    countSpan.classList.remove('text-warning');
-                }
-            });
-        }
+// Navigation Functions
+function showPage(pageId) {
+    // Hide all pages
+    document.querySelectorAll('.page').forEach(page => {
+        page.classList.remove('active');
     });
-});
+    
+    // Show selected page
+    document.getElementById(pageId).classList.add('active');
+    
+    // Update nav links
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+    });
+    
+    const activeLink = document.querySelector(`[href="#${pageId}"]`);
+    if (activeLink && !activeLink.classList.contains('btn-primary')) {
+        activeLink.classList.add('active');
+    }
+    
+    // Load page-specific content
+    if (pageId === 'jobs') {
+        loadJobs();
+    } else if (pageId === 'companies') {
+        loadCompanies();
+    } else if (pageId === 'career-advice') {
+        loadCareerPaths();
+    }
+}
