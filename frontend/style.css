@@ -1,3 +1,4 @@
+/* Reset and Base Styles */
 * {
     margin: 0;
     padding: 0;
@@ -893,6 +894,7 @@ body {
     font-size: 1.1rem;
     color: var(--silver);
 }
+
 /* Jobs Section */
 .jobs-filters {
     display: flex;
@@ -1707,4 +1709,3 @@ body {
 .success-message i {
     color: #16a34a;
 }
-
