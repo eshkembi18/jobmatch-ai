@@ -1,372 +1,183 @@
-// AI Job Board - Job Posting JavaScript functionality
+// ===== mini debug HUD (remove later) =====
+(function(){
+  const bar = document.createElement('div');
+  bar.id = 'jmai-debug';
+  bar.style.cssText = 'position:fixed;bottom:8px;left:8px;background:#111;color:#fff;padding:6px 10px;border-radius:6px;font:12px/1.2 system-ui;z-index:99999;opacity:.85';
+  bar.textContent = 'JS loaded ✓';
+  document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(bar));
+  window.addEventListener('error', e => { bar.textContent = 'JS error: ' + (e.message||'unknown'); bar.style.background = '#7a001f';});
+  window.__jmaiDebug = (msg)=>{ bar.textContent = msg; };
+})();
+// ===== helpers =====
+const $  = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+const byId = id => document.getElementById(id);
+const toggle = (el, on) => el && el.classList.toggle('d-none', !on);
+const debounce = (fn, d=500)=>{ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a), d); }; };
 
-class JobPosting {
-    constructor() {
-        this.init();
-    }
-
-    init() {
-        this.setupEventListeners();
-        this.setupFormValidation();
-    }
-
-    setupEventListeners() {
-        // Form submission
-        document.getElementById('jobPostingForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            this.submitJobPosting();
-        });
-
-        // Real-time validation
-        const requiredFields = ['jobTitle', 'company', 'location', 'contactEmail', 'jobType', 'jobDescription', 'jobRequirements'];
-        requiredFields.forEach(fieldId => {
-            const field = document.getElementById(fieldId);
-            if (field) {
-                field.addEventListener('blur', () => this.validateField(field));
-                field.addEventListener('input', () => this.clearFieldError(field));
-            }
-        });
-
-        // Salary validation
-        document.getElementById('salaryMin').addEventListener('input', () => this.validateSalaryRange());
-        document.getElementById('salaryMax').addEventListener('input', () => this.validateSalaryRange());
-
-        // Skills input enhancement
-        this.setupSkillsInput();
-    }
-
-    setupFormValidation() {
-        // Add Bootstrap validation classes
-        const form = document.getElementById('jobPostingForm');
-        form.classList.add('needs-validation');
-    }
-
-    setupSkillsInput() {
-        const skillsInput = document.getElementById('skillsTags');
-        
-        // Add placeholder suggestions
-        const commonSkills = [
-            'JavaScript', 'Python', 'Java', 'React', 'Node.js', 'AWS', 'SQL', 'Git',
-            'Docker', 'Kubernetes', 'MongoDB', 'PostgreSQL', 'HTML', 'CSS', 'Vue.js',
-            'Angular', 'Express.js', 'Flask', 'Django', 'Spring Boot', 'GraphQL', 'REST API'
-        ];
-
-        // Create skills suggestions dropdown
-        const suggestionsContainer = document.createElement('div');
-        suggestionsContainer.className = 'skills-suggestions mt-2';
-        suggestionsContainer.innerHTML = `
-            <small class="text-muted">Popular skills:</small><br>
-            ${commonSkills.slice(0, 10).map(skill => 
-                `<span class="badge bg-light text-dark me-1 mb-1 skill-suggestion" style="cursor: pointer;">${skill}</span>`
-            ).join('')}
-        `;
-        
-        skillsInput.parentNode.appendChild(suggestionsContainer);
-
-        // Add click listeners to skill suggestions
-        suggestionsContainer.addEventListener('click', (e) => {
-            if (e.target.classList.contains('skill-suggestion')) {
-                const skill = e.target.textContent;
-                const currentSkills = skillsInput.value.split(',').map(s => s.trim()).filter(s => s);
-                
-                if (!currentSkills.includes(skill)) {
-                    currentSkills.push(skill);
-                    skillsInput.value = currentSkills.join(', ');
-                    this.highlightAddedSkill(e.target);
-                }
-            }
-        });
-    }
-
-    highlightAddedSkill(element) {
-        element.classList.remove('bg-light', 'text-dark');
-        element.classList.add('bg-success', 'text-white');
-        setTimeout(() => {
-            element.classList.remove('bg-success', 'text-white');
-            element.classList.add('bg-light', 'text-dark');
-        }, 1000);
-    }
-
-    validateField(field) {
-        const value = field.value.trim();
-        let isValid = true;
-        let errorMessage = '';
-
-        // Check if required field is empty
-        if (field.hasAttribute('required') && !value) {
-            isValid = false;
-            errorMessage = 'This field is required.';
-        }
-
-        // Specific validations
-        switch (field.id) {
-            case 'contactEmail':
-                if (value && !this.isValidEmail(value)) {
-                    isValid = false;
-                    errorMessage = 'Please enter a valid email address.';
-                }
-                break;
-            case 'jobTitle':
-                if (value && value.length < 3) {
-                    isValid = false;
-                    errorMessage = 'Job title must be at least 3 characters long.';
-                }
-                break;
-            case 'jobDescription':
-                if (value && value.length < 50) {
-                    isValid = false;
-                    errorMessage = 'Job description should be at least 50 characters long.';
-                }
-                break;
-            case 'jobRequirements':
-                if (value && value.length < 20) {
-                    isValid = false;
-                    errorMessage = 'Requirements should be at least 20 characters long.';
-                }
-                break;
-        }
-
-        this.displayFieldValidation(field, isValid, errorMessage);
-        return isValid;
-    }
-
-    validateSalaryRange() {
-        const minSalary = parseInt(document.getElementById('salaryMin').value) || 0;
-        const maxSalary = parseInt(document.getElementById('salaryMax').value) || 0;
-
-        if (minSalary > 0 && maxSalary > 0 && minSalary >= maxSalary) {
-            this.displayFieldValidation(
-                document.getElementById('salaryMax'), 
-                false, 
-                'Maximum salary must be higher than minimum salary.'
-            );
-            return false;
-        }
-
-        // Clear any previous errors
-        this.clearFieldError(document.getElementById('salaryMin'));
-        this.clearFieldError(document.getElementById('salaryMax'));
-        return true;
-    }
-
-    displayFieldValidation(field, isValid, errorMessage) {
-        // Remove existing validation classes and messages
-        field.classList.remove('is-valid', 'is-invalid');
-        this.removeErrorMessage(field);
-
-        if (!isValid) {
-            field.classList.add('is-invalid');
-            this.addErrorMessage(field, errorMessage);
-        } else if (field.value.trim()) {
-            field.classList.add('is-valid');
-        }
-    }
-
-    addErrorMessage(field, message) {
-        const errorDiv = document.createElement('div');
-        errorDiv.className = 'invalid-feedback';
-        errorDiv.textContent = message;
-        field.parentNode.appendChild(errorDiv);
-    }
-
-    removeErrorMessage(field) {
-        const existingError = field.parentNode.querySelector('.invalid-feedback');
-        if (existingError) {
-            existingError.remove();
-        }
-    }
-
-    clearFieldError(field) {
-        field.classList.remove('is-invalid');
-        this.removeErrorMessage(field);
-    }
-
-    isValidEmail(email) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
-    }
-
-    validateForm() {
-        const requiredFields = [
-            'jobTitle', 'company', 'location', 'contactEmail', 
-            'jobType', 'jobDescription', 'jobRequirements'
-        ];
-
-        let isFormValid = true;
-
-        // Validate all required fields
-        requiredFields.forEach(fieldId => {
-            const field = document.getElementById(fieldId);
-            if (!this.validateField(field)) {
-                isFormValid = false;
-            }
-        });
-
-        // Validate salary range
-        if (!this.validateSalaryRange()) {
-            isFormValid = false;
-        }
-
-        return isFormValid;
-    }
-
-    async submitJobPosting() {
-        // Show loading state
-        const submitBtn = document.querySelector('#jobPostingForm button[type="submit"]');
-        const originalText = submitBtn.innerHTML;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Posting Job...';
-        submitBtn.disabled = true;
-
-        try {
-            // Validate form
-            if (!this.validateForm()) {
-                throw new Error('Please fix the validation errors before submitting.');
-            }
-
-            // Collect form data
-            const formData = this.collectFormData();
-
-            // Submit to API
-            const response = await fetch('/api/jobs', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData)
-            });
-
-            const data = await response.json();
-
-            if (data.success) {
-                this.showSuccessModal();
-                this.resetForm();
-            } else {
-                throw new Error(data.error || 'Failed to post job');
-            }
-
-        } catch (error) {
-            console.error('Error posting job:', error);
-            this.showError(error.message);
-        } finally {
-            // Restore button state
-            submitBtn.innerHTML = originalText;
-            submitBtn.disabled = false;
-        }
-    }
-
-    collectFormData() {
-        const skills = document.getElementById('skillsTags').value
-            .split(',')
-            .map(skill => skill.trim())
-            .filter(skill => skill.length > 0);
-
-        return {
-            title: document.getElementById('jobTitle').value.trim(),
-            company: document.getElementById('company').value.trim(),
-            location: document.getElementById('location').value.trim(),
-            contact_email: document.getElementById('contactEmail').value.trim(),
-            job_type: document.getElementById('jobType').value,
-            experience_level: document.getElementById('experienceLevel').value,
-            is_remote: document.getElementById('isRemote').checked,
-            salary_min: parseInt(document.getElementById('salaryMin').value) || null,
-            salary_max: parseInt(document.getElementById('salaryMax').value) || null,
-            description: document.getElementById('jobDescription').value.trim(),
-            requirements: document.getElementById('jobRequirements').value.trim(),
-            skills: skills
-        };
-    }
-
-    resetForm() {
-        document.getElementById('jobPostingForm').reset();
-        
-        // Clear validation classes
-        document.querySelectorAll('.is-valid, .is-invalid').forEach(field => {
-            field.classList.remove('is-valid', 'is-invalid');
-        });
-
-        // Remove error messages
-        document.querySelectorAll('.invalid-feedback').forEach(error => {
-            error.remove();
-        });
-    }
-
-    showSuccessModal() {
-        const modal = new bootstrap.Modal(document.getElementById('successModal'));
-        modal.show();
-    }
-
-    showError(message) {
-        // Create error alert
-        const alertDiv = document.createElement('div');
-        alertDiv.className = 'alert alert-danger alert-dismissible fade show';
-        alertDiv.innerHTML = `
-            <i class="fas fa-exclamation-triangle me-2"></i>
-            <strong>Error:</strong> ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        `;
-
-        // Insert at top of form
-        const form = document.getElementById('jobPostingForm');
-        form.insertBefore(alertDiv, form.firstChild);
-
-        // Scroll to top of form
-        form.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-        // Auto-remove after 10 seconds
-        setTimeout(() => {
-            if (alertDiv.parentNode) {
-                alertDiv.remove();
-            }
-        }, 10000);
-    }
-
-    showSuccess(message) {
-        // Create success alert
-        const alertDiv = document.createElement('div');
-        alertDiv.className = 'alert alert-success alert-dismissible fade show';
-        alertDiv.innerHTML = `
-            <i class="fas fa-check-circle me-2"></i>
-            <strong>Success:</strong> ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        `;
-
-        // Insert at top of form
-        const form = document.getElementById('jobPostingForm');
-        form.insertBefore(alertDiv, form.firstChild);
-
-        // Scroll to top of form
-        form.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+// If there are duplicate IDs (q/loc in hero + advanced form), pick the one you typed in.
+function pickInput(id){
+  const els = $$(`[id="${id}"]`);
+  if (!els.length) return null;
+  const filled = els.find(el => (el.value || '').trim());
+  return filled || els[0];
 }
 
-// Initialize job posting functionality when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    new JobPosting();
-});
+// ===== API =====
+async function fetchJobs(q = "", loc = "") {
+  const params = new URLSearchParams();
+  if (q)   params.set("q", q);
+  if (loc) params.set("loc", loc);
+  const url = `/api/jobs?${params.toString()}`;
+  const res = await fetch(url, { credentials:'include' });
+  if (!res.ok) throw new Error(`GET ${url} -> ${res.status}`);
+  const data = await res.json();
+  return Array.isArray(data) ? data : [];
+}
 
-// Add character counters for text areas
-document.addEventListener('DOMContentLoaded', () => {
-    const textareas = document.querySelectorAll('textarea');
-    
-    textareas.forEach(textarea => {
-        const maxLength = textarea.getAttribute('maxlength');
-        if (maxLength) {
-            const counter = document.createElement('div');
-            counter.className = 'form-text text-end';
-            counter.innerHTML = `<span class="char-count">0</span>/${maxLength} characters`;
-            textarea.parentNode.appendChild(counter);
+async function uploadResume(file){
+  if (!file) return;
+  const fd = new FormData();
+  fd.append('resume', file); // backend expects 'resume'
+  const res = await fetch('/api/upload-resume', { method:'POST', body: fd, credentials:'include' });
+  const data = await res.json().catch(()=>({}));
+  if (!res.ok) throw new Error(data.error || `Upload failed (${res.status})`);
+  return data; // {message, filename, url}
+}
 
-            textarea.addEventListener('input', () => {
-                const count = textarea.value.length;
-                const countSpan = counter.querySelector('.char-count');
-                countSpan.textContent = count;
-                
-                if (count > maxLength * 0.9) {
-                    countSpan.classList.add('text-warning');
-                } else {
-                    countSpan.classList.remove('text-warning');
-                }
-            });
-        }
+// ===== render =====
+function renderJobs(jobs){
+  const box = byId('results');
+  toggle(byId('searchSpinner'), false);
+  if (!box) return;
+
+  if (!jobs.length){
+    box.innerHTML = `
+      <div class="col-12">
+        <div class="alert alert-warning mb-0">
+          No jobs found. Try another search or seed at <code>/api/seed</code>.
+        </div>
+      </div>`;
+    return;
+  }
+
+  box.innerHTML = jobs.map(j=>{
+    const title = j.title || 'Untitled';
+    const company = j.company || '';
+    const loc = j.location ? ` · ${j.location}` : '';
+    const desc = (j.description || '').slice(0, 240);
+    const skills = Array.isArray(j.skills) ? j.skills
+                 : (typeof j.skills === 'string' ? j.skills.split(',') : []);
+    const chips = skills.slice(0,6).map(s=>`<span class="badge bg-light text-dark me-1 mb-1">${s.trim()}</span>`).join('');
+    return `
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100 shadow-sm">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title mb-1">${title}</h5>
+            <div class="text-muted small mb-2">${company}${loc}</div>
+            <p class="card-text flex-grow-1">${desc}</p>
+            <div class="mb-2">${chips}</div>
+            ${j.salary ? `<div class="fw-bold mb-2">${j.salary}</div>` : ''}
+            <div><button class="btn btn-primary btn-sm" type="button">Details</button></div>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function showUploadedResume({ filename, url }){
+  const status = byId('uploadStatus');
+  const link   = byId('resumeLink');
+  const wrap   = byId('resumePreviewWrap');
+  const frame  = byId('resumePreview');
+
+  if (status && link){
+    link.href = url;
+    link.textContent = filename || 'resume';
+    toggle(status, true);
+  }
+  if (wrap && frame){
+    if ((filename || '').toLowerCase().endsWith('.pdf')) {
+      frame.src = url; toggle(wrap, true);
+    } else {
+      frame.src = '';  toggle(wrap, false);
+    }
+  }
+}
+
+// ===== actions =====
+async function doSearch(ev){
+  if (ev) ev.preventDefault();
+  toggle(byId('searchSpinner'), true);
+
+  const qEl   = pickInput('q');
+  const locEl = pickInput('loc');
+
+  // Optional extra filters: fold into q for broader match; loc stays separate
+  const type   = byId('jobTypeSelect')?.value || '';
+  const remote = byId('remoteCheck')?.checked ? ' remote' : '';
+
+  const q   = [qEl?.value || '', type, remote].filter(Boolean).join(' ').trim();
+  const loc = (locEl?.value || '').trim();
+
+  try {
+    const jobs = await fetchJobs(q, loc);
+    renderJobs(jobs);
+  } catch (e) {
+    toggle(byId('searchSpinner'), false);
+    byId('results').innerHTML = `<div class="col-12"><div class="alert alert-danger">${e.message}</div></div>`;
+  }
+}
+const doSearchDebounced = debounce(doSearch, 500);
+
+function bindSearch(){
+  // Buttons (handles duplicates/aliases)
+  $$(`#searchBtn, [data-action="search"], .js-search-btn`).forEach(b => b.addEventListener('click', doSearch));
+  byId('searchForm')?.addEventListener('submit', doSearch);
+
+  // Type-to-search
+  pickInput('q')?.addEventListener('input', doSearchDebounced);
+  pickInput('loc')?.addEventListener('input', doSearchDebounced);
+}
+
+function bindChips(){
+  $$('.chip').forEach(ch => ch.addEventListener('click', ()=>{
+    const qEl = pickInput('q'); if (!qEl) return;
+    qEl.value = ch.textContent.trim();
+    doSearch();
+  }));
+}
+
+function bindResume(){
+  // Hidden inputs (hero + side)
+  $$('#resume-hero-input, #resume-side-input, input[type="file"][name="resume"]').forEach(inp=>{
+    inp.addEventListener('change', async (e)=>{
+      const f = e.target.files?.[0]; if (!f) return;
+      try { const data = await uploadResume(f); showUploadedResume(data); }
+      catch(err){ alert(err.message || 'Upload failed'); }
     });
+  });
+  // Safety for visible button (label)
+  byId('uploadResumeBtn')?.addEventListener('click',(e)=>{
+    e.preventDefault();
+    (byId('resume-hero-input') || byId('resume-side-input') || $('input[type="file"][name="resume"]'))?.click();
+  });
+}
+
+// ===== init =====
+document.addEventListener('DOMContentLoaded', async ()=>{
+  bindSearch();
+  bindChips();
+  bindResume();
+
+  // Initial load: show something right away (seed once if empty)
+  toggle(byId('searchSpinner'), true);
+  try {
+    let jobs = await fetchJobs('', '');
+    if (!jobs.length) { try { await fetch('/api/seed', { method:'POST' }); } catch {} jobs = await fetchJobs('', ''); }
+    renderJobs(jobs);
+  } catch (e) {
+    toggle(byId('searchSpinner'), false);
+    byId('results').innerHTML = `<div class="col-12"><div class="alert alert-danger">${e.message}</div></div>`;
+  }
 });

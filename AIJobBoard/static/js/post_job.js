@@ -1,4 +1,5 @@
 // static/js/post_job.js
+// static/js/post_job.js
 document.getElementById('job-form').addEventListener('submit', async e => {
   e.preventDefault();
   const form = e.target;

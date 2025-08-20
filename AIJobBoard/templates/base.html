@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>{% block title %}JobMatch AI{% endblock %}</title>
+
+  <!-- Fonts / Icons (optional) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+
+  <!-- ✅ Your CSS from /static -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="navbar">
+    <div class="nav-container">
+      <a class="nav-brand" href="{{ url_for('home') }}">
+        <div class="brand-badge">AI</div><span>JobMatch AI</span>
+      </a>
+      <nav class="navlinks">
+        <a href="{{ url_for('home') }}">Jobs</a>
+        <a href="{{ url_for('page', page='companies') }}">Companies</a>
+        <a href="{{ url_for('page', page='career_advice') }}">Career Advice</a>
+        <a href="{{ url_for('page', page='about') }}">About</a>
+      </nav>
+      <div class="nav-actions">
+        <a class="btn outline" href="{{ url_for('page', page='set_skills') }}"><i class="fa-solid fa-user-gear"></i> Set Skills</a>
+        <a class="btn dark" href="{{ url_for('page', page='post_job') }}">Post Job</a>
+      </div>
+    </div>
+  </header>
+
+  {% block content %}{% endblock %}
+
+  <footer class="footer">© <span id="year"></span> JobMatch AI</footer>
+
+  <!-- ✅ Your JS from /static -->
+  <script src="{{ url_for('static', filename='main.js') }}"></script>
+</body>
+</html>
